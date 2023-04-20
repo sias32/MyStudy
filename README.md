@@ -19,6 +19,7 @@
     - PHP
     - Прочее
   - Прочее
+  - [Projects](/!Programmer/Projects/)
 - Прочее общее
   - [Git](/Other_all/Git/)
   - [MarkDown](/Other_all/MarkDown/)

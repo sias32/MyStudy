@@ -1,0 +1,80 @@
+{
+  // SSH
+  "remote.SSH.remotePlatform": {
+  },
+
+  // Ext - indent-rainbow
+  "indentRainbow.indicatorStyle": "light",
+  "indentRainbow.lightIndicatorStyleLineWidth": 2,
+  "indentRainbow.colors": [
+    "rgba(255,255,64,0.3)",
+    "rgba(127,255,127,0.3)",
+    "rgba(255,127,255,0.3)",
+    "rgba(79,236,236,0.3)"
+  ],
+
+  // GitLens
+  "gitlens.defaultDateFormat": "dddd DD MMMM YYYY HH:mm:ss Z",
+  "gitlens.defaultTimeFormat": "HH:mm:ss",
+  "gitlens.defaultDateLocale": null,
+  "gitlens.defaultDateShortFormat": "DD.MM.YYYY",
+  "gitlens.views.branches.branches.layout": "list",
+
+  // Text
+  "editor.fontSize": 16,
+  "editor.smoothScrolling": true,
+  "editor.tabSize": 2,
+  "editor.renderWhitespace": "boundary",
+  "editor.detectIndentation": false,
+  "editor.lineHeight": 22,
+  "editor.fontFamily": "Fira Code",
+  "editor.fontLigatures": true,
+  "editor.linkedEditing": true,
+
+  // VSCODE
+  "workbench.startupEditor": "newUntitledFile",
+  "workbench.iconTheme": "vs-nomo-dark",
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.activityBar.visible": false,
+  "security.workspace.trust.untrustedFiles": "newWindow",
+  "security.workspace.trust.enabled": false,
+  "explorer.confirmDelete": false,
+
+  // Terminal
+  "terminal.integrated.fontSize": 15,
+  "editor.linkedEditing": true,
+
+  // HTML
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // PHP
+  "[php]": {
+    "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+  },
+  "php.validate.enable": true,
+  "phpserver.phpPath": "C:/php/php.exe",
+
+  // JSON
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Игнорирование настроек
+  "settingsSync.ignoredSettings": [
+    "[php]",
+    "php.validate.enable",
+    "-php.validate.executablePath",
+    "phpserver.phpPath",
+    "-php.debug.executablePath",
+  ],
+  // Игнорирование расширений
+  "settingsSync.ignoredExtensions": [
+    "xdebug.php-debug",
+    "bmewburn.vscode-intelephense-client",
+    "brapifra.phpserver",
+    "yzane.markdown-pdf",
+    "mads-hartmann.bash-ide-vscode"
+  ]
+}

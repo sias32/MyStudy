@@ -20,8 +20,9 @@
     - Прочее
   - Прочее
 - Прочее общее
-  - [Git](/Other/git/)
+  - [Git](/Other/Git/)
   - [MarkDown](/Other/MarkDown/)
-  - [Python](/Other/python/)
+  - [Python](/Other/Python/)
+  - [Visual Studio Code](/Other/VSCode/)
   - [Платформы для обучения](/Other/Platforms.md)
   - [Онлайн-среды](/Other/Online-IDE.md)

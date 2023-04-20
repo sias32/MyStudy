@@ -18,8 +18,9 @@
     - Csharp
     - PHP
     - Прочее
-  - Прочее
-  - [Projects](/!Programmer/Projects/)
+  - [Прочее](/!Programmer/Other/)
+    - [Фрймворки](/!Programmer/Other/Frameworks/)
+  - [Проекты](/!Programmer/Projects/)
 - Прочее общее
   - [Git](/Other_all/Git/)
   - [MarkDown](/Other_all/MarkDown/)

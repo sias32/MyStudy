@@ -20,6 +20,7 @@
     - Прочее
   - [Прочее](/!Programmer/Other/)
     - [Фрймворки](/!Programmer/Other/Frameworks/)
+    - [CMS](/!Programmer/Other/CMS/)
   - [Проекты](/!Programmer/Projects/)
 - Прочее общее
   - [Git](/Other_all/Git/)

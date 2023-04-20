@@ -23,6 +23,9 @@ Git <sup>[Link](https://руни.рф/index.php/Git)</sup> — распреде�
     - [Руководство](https://docs.github.com/ru/get-started)
 
 [**GitLab**](https://about.gitlab.com/)
+
 text...
+
 [**GitBook**](https://www.gitbook.com/)
+
 text...

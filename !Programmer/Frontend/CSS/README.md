@@ -20,8 +20,7 @@ CSS (Cascading Style Sheets) <sup>[Link](https://руни.рф/index.php/CSS)</s
 - sass — отличается отсутствием фигурных скобок, в нём вложенные элементы реализованы с помощью отступов;
 - SCSS (Sassy CSS) — использует фигурные скобки, как и сам CSS.
 
-[Документация [EN]](https://sass-lang.com/documentation/)
-[Документация [RU]](https://sass-lang.su/) - может немного отставать
+Документация [[EN]](https://sass-lang.com/documentation/) | [[RU]](https://sass-lang.su/) - может немного отставать
 
 **Less**
 text...

@@ -7,6 +7,7 @@ text...
 
 **Полезное**
 
+- Валивидация разметки [W3](https://validator.w3.org/) <sup>**важное**</sup>
 - Справочник тегов HTML/CSS + псевдо [htmlbase](https://htmlbase.ru/)
 - Справочник тегов HTML [htmlacademy](https://htmlacademy.ru/blog/html-tags/book)
 

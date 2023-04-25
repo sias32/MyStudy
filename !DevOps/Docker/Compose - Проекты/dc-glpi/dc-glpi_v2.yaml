@@ -1,0 +1,106 @@
+version: "2.1"
+
+services:
+  glpi-maria-db:
+    container_name: glpi-maria-db
+    hostname: glpi-maria-db
+    image: mariadb:10.7
+    env_file:
+      - ./dc-file/env/env-mariadb
+    volumes:
+      - ./mariadb/var/lib/mysql:/var/lib/mysql:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.70'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    restart: unless-stopped
+    stop_grace_period: 1m
+    networks:
+      glpi_net_backend:
+        ipv4_address: 10.10.3.2
+        aliases:
+          - glpi-maria-db
+
+  glpi-db-backup:
+    container_name: glpi-db-backup
+    hostname: glpi-db-backup
+    image: tiredofit/db-backup:3.7.5
+    env_file:
+      - ./dc-file/env/env-db-backup
+    volumes:
+      - ./backups:/backup:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    restart: unless-stopped
+    stop_grace_period: 1m
+    networks:
+      glpi_net_backend:
+        ipv4_address: 10.10.3.3
+        aliases:
+          - glpi-db-backup
+
+  glpi-server:
+    container_name : glpi-server
+    hostname: glpi-server
+    image: diouxx/glpi:latest
+    env_file:
+      - ./dc-file/env/env-glpi
+    volumes:
+      - ./glpi/var/www/html/glpi:/var/www/html/glpi:rw
+    deploy:
+      resources:
+        limits:
+          cpus: '0.70'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+    restart: unless-stopped
+    stop_grace_period: 1m
+    ports:
+      - "85:80"
+    networks:
+      glpi_net_backend:
+        ipv4_address: 10.10.3.4
+        aliases:
+          - glpi-server
+      glpi_net_frontend:
+        ipv4_address: 10.10.4.3
+
+networks:
+  glpi_net_frontend:
+    name: glpi_net_frontend
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.10.4.0/24
+  glpi_net_backend:
+    name: glpi_net_backend
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.10.3.0/24
+
+# glpi/glpi для учетной записи администратора
+# tech/tech для технической учетной записи
+# normal/normal для обычной учетной записи
+# post-only/postonly только для подачи заявок
+
+# https://github.com/tiredofit/docker-db-backup

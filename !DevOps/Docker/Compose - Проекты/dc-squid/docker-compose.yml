@@ -1,0 +1,17 @@
+
+version: '3.9'
+
+services:
+  squid:
+    container_name: squid
+    hostname: squid
+    image: sameersbn/squid:3.5.27-2
+    ports:
+      - "3128:3128"
+    volumes:
+      - ./squid/cache:/var/spool/squid:rw
+      - ./squid/log/:/var/log/squid:rw
+      - ./squid.conf:/etc/squid/squid.conf:rw
+    restart: unless-stopped
+
+# https://github.com/sameersbn/docker-squid

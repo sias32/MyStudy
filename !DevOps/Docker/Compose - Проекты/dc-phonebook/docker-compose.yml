@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  phonebook:
+   container_name: phonebook
+   hostname: phonebook
+   image: webhippie/php-nginx:latest
+   ports:
+    - 8000:8080
+  #  environment:
+  #   - 
+   volumes:
+     - ./ad_php_phonebook:/srv/www:ro
+   restart: unless-stopped
+   stop_grace_period: 1m

@@ -1,0 +1,24 @@
+# - DEBUG_MODE=TRUE
+DB_TYPE=mariadb
+DB_HOST=glpi-maria-db
+DB_NAME=glpi
+DB_USER=glpi
+DB_PASS=glpi_pwd
+# DB_TYPE=mysql
+DB_PORT=3306
+# backup every minute
+DB_DUMP_FREQ=60
+# backup starts immediately
+# Absolute HHMM, e.g. 2330 or 0415
+# DB_DUMP_BEGIN=1430
+# clean backups they are older than 5 minute
+# DB_DUMP_TARGET="/backup"
+DB_CLEANUP_TIME=420
+CHECKSUM=SHA1
+# Use either Gzip GZ, Bzip2 BZ, XZip XZ, ZSTD ZSTD or none NONE
+COMPRESSION=GZ
+# 1-9
+# zSTD 1-19
+COMPRESSION_LEVEL=3
+SPLIT_DB=FALSE
+CONTAINER_ENABLE_MONITORING=FALSE

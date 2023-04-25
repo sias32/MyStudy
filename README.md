@@ -6,7 +6,7 @@
 
 ## Карта
 
-- DevOps (Empty)
+- DevOps
   - [Docker (+ DC)](/!DevOps/Docker/)
   - Прочее
 - Programmer (FullStack)

@@ -28,5 +28,5 @@
   - [MarkDown](/Other_all/MarkDown/)
   - [Python](/Other_all/Python/)
   - [Visual Studio Code](/Other_all/VSCode/)
-  - [Платформы для обучения](/Other_all/Platforms.md)
+  - [Платформы](/Other_all/Platforms/)
   - [Онлайн-среды](/Other_all/Online-IDE.md)

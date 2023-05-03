@@ -1,0 +1,309 @@
+version: "3.8"
+
+services:
+  db-pgsql:
+    container_name: db-pgsql
+    hostname: db-pgsql
+
+    image: postgres:15.2-alpine3.17
+
+    env_file:
+      - ./env/db-pgsql.conf
+    secrets:
+      - DB_USER
+      - DB_PASSWORD
+
+    volumes:
+      - ./db-pgsql/var/lib/postgresql/data:/var/lib/postgresql/data:rw
+      # - ./postgres-db/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
+      # - ./postgres-db/ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
+      # - ./postgres-db/ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U zabbix -h 127.0.0.1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    stop_grace_period: 1m
+
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.10
+        aliases:
+          - db-pgsql
+          - db
+
+  adminer:
+    container_name: adminer
+    hostname: adminer
+
+    image: adminer:4.8.1
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.2"
+          memory: 128M
+        reservations:
+          cpus: "0.1"
+          memory: 64M
+
+    restart: unless-stopped
+    stop_grace_period: 1m
+    depends_on:
+      db-pgsql:
+        condition: service_healthy
+
+    ports:
+      - "8888:8080"
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.20
+        aliases:
+          - adminer
+      zbx_front:
+        ipv4_address: 10.10.10.10
+
+  zabbix-server:
+    container_name: zabbix-server
+    hostname: zabbix-server
+
+    image: zabbix/zabbix-server-pgsql:alpine-6.4.2
+
+    env_file:
+      - ./env/zbx-server.conf
+      - ./env/db-pgsql.conf
+    secrets:
+      - DB_USER
+      - DB_PASSWORD
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./zabbix/usr/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts:ro
+      - ./zabbix/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:ro
+      - ./zabbix/var/lib/zabbix/dbscripts:/var/lib/zabbix/dbscripts:ro
+      - ./zabbix/var/lib/zabbix/export:/var/lib/zabbix/export:rw
+      - ./zabbix/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zabbix/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zabbix/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+      - ./zabbix/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
+      - ./zabbix/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
+
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+    deploy:
+      resources:
+        limits:
+          cpus: "0.70"
+          memory: 1G
+        reservations:
+          cpus: "0.5"
+          memory: 512M
+    sysctls:
+      - net.ipv4.ip_local_port_range=1024 65000
+      - net.ipv4.conf.all.accept_redirects=0
+      - net.ipv4.conf.all.secure_redirects=0
+      - net.ipv4.conf.all.send_redirects=0
+
+    restart: unless-stopped
+    stop_grace_period: 1m
+    depends_on:
+      db-pgsql:
+        condition: service_healthy
+
+    ports:
+      - "10051:10051"
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.30
+        aliases:
+          - zabbix-server
+      zbx_front:
+        ipv4_address: 10.10.10.20
+
+    labels:
+      com.zabbix.description: "Zabbix server with PostgreSQL database support"
+      com.zabbix.company: "Zabbix LLC"
+      com.zabbix.component: "zabbix-server"
+      com.zabbix.dbtype: "pgsql"
+      com.zabbix.os: "alpine"
+
+  zabbix-agent:
+    container_name: zabbix-agent
+    hostname: zabbix-agent
+
+    image: zabbix/zabbix-agent:alpine-6.4.2
+    env_file:
+      - ./env/zbx-agent.conf
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./zabbix/etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro
+      - ./zabbix/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
+      - ./zabbix/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
+      - ./zabbix/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+      mode: global
+    privileged: true
+    pid: "host"
+    restart: unless-stopped
+    stop_grace_period: 1m
+    depends_on:
+      - zabbix-server
+
+    ports:
+      - "10050:10050"
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.40
+        aliases:
+          - zabbix-agent
+
+    labels:
+      com.zabbix.description: "Zabbix agent"
+      com.zabbix.company: "Zabbix LLC"
+      com.zabbix.component: "zabbix-agentd"
+      com.zabbix.os: "alpine"
+
+  zabbix-web:
+    container_name: zabbix-web
+    hostname: zabbix-web
+
+    image: zabbix/zabbix-web-nginx-pgsql:alpine-6.4.2
+
+    env_file:
+      - ./env/zbx-web.conf
+      - ./env/db-pgsql.conf
+    secrets:
+      - DB_USER
+      - DB_PASSWORD
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./zabbix/etc/ssl/nginx:/etc/ssl/nginx:ro
+      - ./zabbix/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
+      # - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
+      # - ./env_vars/.ZBX_DB_CERT_FILE:/run/secrets/client-cert.pem:ro
+      # - ./env_vars/.ZBX_DB_KEY_FILE:/run/secrets/client-key.pem:ro
+
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.70"
+          memory: 512M
+        reservations:
+          cpus: "0.5"
+          memory: 256M
+    sysctls:
+      - net.core.somaxconn=65535
+
+    restart: unless-stopped
+    stop_grace_period: 1m
+    depends_on:
+      db-pgsql:
+        condition: service_healthy
+      zabbix-server:
+        condition: service_started
+
+    ports:
+      - "80:8080"
+      - "443:8443"
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.50
+        aliases:
+          - zabbix-web
+      zbx_front:
+        ipv4_address: 10.10.10.30
+
+    labels:
+      com.zabbix.description: "Zabbix frontend on Nginx web-server with PostgreSQL database support"
+      com.zabbix.company: "Zabbix LLC"
+      com.zabbix.component: "zabbix-frontend"
+      com.zabbix.webserver: "nginx"
+      com.zabbix.dbtype: "pgsql"
+      com.zabbix.os: "alpine"
+
+  grafana:
+    container_name: grafana
+    hostname: grafana
+
+    image: grafana/grafana:9.5.1-ubuntu
+
+    healthcheck:
+      test: [ "CMD", "wget", "http://localhost:3000/", "--spider" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+    restart: unless-stopped
+    stop_grace_period: 1m
+    depends_on:
+      db-pgsql:
+        condition: service_healthy
+      zabbix-server:
+        condition: service_started
+      zabbix-web:
+        condition: service_started
+
+    ports:
+      - "3000:3000"
+    networks:
+      zbx_back:
+        ipv4_address: 1.1.1.60
+        aliases:
+          - grafana
+      zbx_front:
+        ipv4_address: 10.10.10.40
+
+networks:
+  zbx_front:
+    name: zbx_front
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.10.0/24
+
+  zbx_back:
+    name: zbx_back
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+        - subnet: 1.1.1.0/24
+
+secrets:
+  DB_USER:
+    file: ./secrets/db_user
+  DB_PASSWORD:
+    file: ./secrets/db_pwd

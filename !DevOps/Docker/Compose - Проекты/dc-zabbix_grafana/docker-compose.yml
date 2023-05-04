@@ -1,3 +1,9 @@
+# Создание пользователя grafana в db
+# docker exec -it db-pgsql bash
+# psql -h localhost -p 5432 -U zabbix -W
+# create user grafana with password 'grafana_pwd';
+# grant select on all tables in schema public to grafana;
+
 version: "3.8"
 
 services:
@@ -15,9 +21,9 @@ services:
 
     volumes:
       - ./db-pgsql/var/lib/postgresql/data:/var/lib/postgresql/data:rw
-      # - ./postgres-db/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
-      # - ./postgres-db/ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
-      # - ./postgres-db/ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
+      # - ./db-pgsql/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
+      # - ./db-pgsql/ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
+      # - ./db-pgsql/ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
 
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U zabbix -h 127.0.0.1" ]
@@ -166,8 +172,6 @@ services:
     depends_on:
       - zabbix-server
 
-    ports:
-      - "10050:10050"
     networks:
       zbx_back:
         ipv4_address: 1.1.1.40

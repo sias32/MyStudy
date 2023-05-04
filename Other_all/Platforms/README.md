@@ -12,10 +12,13 @@ text...
 
 - [Hexlet](https://ru.hexlet.io/pages/about) - экосистема, в которую входят онлайн-платформа для обучения программированию, колледж и серия опенсорс-проектов
   Предоставляет свою, хорошую [карту развития](./Roadmap_Hexlet/), с полезными ссылками:
+
   - OpenSource проекты и возможность поучавсовать в них - [Link](https://guides.hexlet.io/ru/how-to-be-a-helpful-for-the-hexlet-community/) | [Гайд-1](https://ru.hexlet.io/blog/posts/Open-Source-github) | [Гайд-2](https://ru.hexlet.io/blog/posts/kak-prisoedinitsya-k-rabote-nad-opensorsom-chto-takoe-ps1-i-drugie-voprosy-otvechaet-razrabotchik-heksleta-andrey-moshkov)
   - Список сообществ программистов по городам - [Link](https://github.com/Hexlet/ru-local-communities)
   - Сервис резюме - [Link](https://cv.hexlet.io/)
   - Список тестовых заданий от разных компаний - [Link](https://github.com/Hexlet/ru-test-assignments)
+
+- [Selectet Академия](https://selectel.ru/blog/) - Площадка блог, с бесплатными полезными советами, меропиятиями и мини курсами от сервиса [Selectel](https://selectel.ru/)
 
 **DevOps**
 

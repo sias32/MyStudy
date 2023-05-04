@@ -6,3 +6,4 @@ text...
 - **React**
 - **Anguar**
 - **Vue**
+- **[Svelte](https://svelte.dev/)**

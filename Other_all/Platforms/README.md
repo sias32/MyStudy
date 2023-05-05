@@ -5,6 +5,8 @@ text...
 
 **Общие**
 
+- [DevDocs](https://devdocs.io/) - DevDocs объединяет несколько документов по API в быстром, организованном интерфейсе с возможностью поиска.
+-
 - [Diffchacker](https://www.diffchecker.com/) - Проверка чего либо, на различия. Полезно для сранвнеия текста, pdf или картинок, подсвечивает разницу.
 
 - [Udemy](https://about.udemy.com/) - Мировая площадка онлайн курсов и уроков.
@@ -21,6 +23,11 @@ text...
 - [Selectet Академия](https://selectel.ru/blog/) - Площадка блог, с бесплатными полезными советами, меропиятиями и мини курсами от сервиса [Selectel](https://selectel.ru/)
 
 **DevOps**
+
+- Bash:
+
+  - [Habr](https://habr.com/ru/companies/ruvds/articles/325522/) - Статьи, перевод описания работы в bash на русском
+  - [linuxize](https://linuxize.com/) - Форум с полезными статьями и мануалами, помогают получить ответ на многие вопросы
 
 - Курсы Udemy:
   - Полезный преподователь [Edward Viaene](https://www.udemy.com/user/ward-viaene/) [[Сайт](https://in4it.io/)]

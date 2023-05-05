@@ -7,6 +7,7 @@
 ## Карта
 
 - DevOps
+  - [Bash_Scripts](/!DevOps/Bash_Scripts/)
   - [Docker (+ DC)](/!DevOps/Docker/)
   - Прочее
 - Programmer (FullStack)

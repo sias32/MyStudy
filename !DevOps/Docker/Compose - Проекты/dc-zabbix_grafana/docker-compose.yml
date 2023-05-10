@@ -2,7 +2,13 @@
 # docker exec -it db-pgsql bash
 # psql -h localhost -p 5432 -U zabbix -W
 # create user grafana with password 'grafana_pwd';
-# grant select on all tables in schema public to grafana;
+# grant select on all tables in schema public to grafana; или grant pg_real_all_data to grafana;
+
+# Создание пользователя pgadmin в db
+# docker exec -it db-pgsql bash
+# psql -h localhost -p 5432 -U zabbix -W
+# create user pgadmin with password 'pgadmin_pwd';
+# grant all privileges on schema zabbix to pgadmin; или grant pg_write_all_data to pgadmin;
 
 version: "3.8"
 
@@ -20,10 +26,10 @@ services:
       - DB_PASSWORD
 
     volumes:
-      - ./db-pgsql/var/lib/postgresql/data:/var/lib/postgresql/data:rw
-      # - ./db-pgsql/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
-      # - ./db-pgsql/ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
-      # - ./db-pgsql/ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
+      - db-pgsql:/var/lib/postgresql/data:rw
+      # - db-pgsql/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
+      # - db-pgsql/ZBX_DB_CERT_FILE:/run/secrets/server-cert.pem:ro
+      # - db-pgsql/ZBX_DB_KEY_FILE:/run/secrets/server-key.pem:ro
 
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U zabbix -h 127.0.0.1" ]
@@ -41,36 +47,41 @@ services:
           - db-pgsql
           - db
 
-  adminer:
-    container_name: adminer
-    hostname: adminer
+  # pgadmin:
+  #   container_name: pgadmin
+  #   hostname: pgadmin
 
-    image: adminer:4.8.1
+  #   image: dpage/pgadmin4:latest
 
-    deploy:
-      resources:
-        limits:
-          cpus: "0.2"
-          memory: 128M
-        reservations:
-          cpus: "0.1"
-          memory: 64M
+  #   env_file:
+  #     - ./env/pgadmin.conf
 
-    restart: unless-stopped
-    stop_grace_period: 1m
-    depends_on:
-      db-pgsql:
-        condition: service_healthy
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: "0.5"
+  #         memory: 256M
+  #       reservations:
+  #         cpus: "0.25"
+  #         memory: 128M
+  #   sysctls:
+  #     - net.core.somaxconn=65535
 
-    ports:
-      - "8888:8080"
-    networks:
-      zbx_back:
-        ipv4_address: 1.1.1.20
-        aliases:
-          - adminer
-      zbx_front:
-        ipv4_address: 10.10.10.10
+  #   restart: unless-stopped
+  #   stop_grace_period: 1m
+  #   # depends_on:
+  #   #   db-pgsql:
+  #   #     condition: service_healthy
+
+  #   ports:
+  #     - "8080:80"
+  #   networks:
+  #     zbx_back:
+  #       ipv4_address: 1.1.1.20
+  #       aliases:
+  #         - pgadmin
+  #     zbx_front:
+  #       ipv4_address: 10.10.10.10
 
   zabbix-server:
     container_name: zabbix-server
@@ -88,15 +99,15 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./zabbix/usr/lib/zabbix/alertscripts:/usr/lib/zabbix/alertscripts:ro
-      - ./zabbix/usr/lib/zabbix/externalscripts:/usr/lib/zabbix/externalscripts:ro
-      - ./zabbix/var/lib/zabbix/dbscripts:/var/lib/zabbix/dbscripts:ro
-      - ./zabbix/var/lib/zabbix/export:/var/lib/zabbix/export:rw
-      - ./zabbix/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
-      - ./zabbix/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
-      - ./zabbix/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
-      - ./zabbix/var/lib/zabbix/mibs:/var/lib/zabbix/mibs:ro
-      - ./zabbix/var/lib/zabbix/snmptraps:/var/lib/zabbix/snmptraps:ro
+      - zabbix:/usr/lib/zabbix/alertscripts:ro
+      - zabbix:/usr/lib/zabbix/externalscripts:ro
+      - zabbix:/var/lib/zabbix/dbscripts:ro
+      - zabbix:/var/lib/zabbix/export:rw
+      - zabbix:/var/lib/zabbix/modules:ro
+      - zabbix:/var/lib/zabbix/enc:ro
+      - zabbix:/var/lib/zabbix/ssh_keys:ro
+      - zabbix:/var/lib/zabbix/mibs:ro
+      - zabbix:/var/lib/zabbix/snmptraps:ro
 
     ulimits:
       nproc: 65535
@@ -106,11 +117,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.70"
-          memory: 1G
+          cpus: "0.60"
+          memory: 640M
         reservations:
-          cpus: "0.5"
-          memory: 512M
+          cpus: "0.30"
+          memory: 320M
     sysctls:
       - net.ipv4.ip_local_port_range=1024 65000
       - net.ipv4.conf.all.accept_redirects=0
@@ -151,10 +162,10 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./zabbix/etc/zabbix/zabbix_agentd.d:/etc/zabbix/zabbix_agentd.d:ro
-      - ./zabbix/var/lib/zabbix/modules:/var/lib/zabbix/modules:ro
-      - ./zabbix/var/lib/zabbix/enc:/var/lib/zabbix/enc:ro
-      - ./zabbix/var/lib/zabbix/ssh_keys:/var/lib/zabbix/ssh_keys:ro
+      - zabbix:/etc/zabbix/zabbix_agentd.d:ro
+      - zabbix:/var/lib/zabbix/modules:ro
+      - zabbix:/var/lib/zabbix/enc:ro
+      - zabbix:/var/lib/zabbix/ssh_keys:ro
 
     deploy:
       resources:
@@ -200,11 +211,11 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /etc/timezone:/etc/timezone:ro
-      - ./zabbix/etc/ssl/nginx:/etc/ssl/nginx:ro
-      - ./zabbix/usr/share/zabbix/modules/:/usr/share/zabbix/modules/:ro
-      # - ./env_vars/.ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
-      # - ./env_vars/.ZBX_DB_CERT_FILE:/run/secrets/client-cert.pem:ro
-      # - ./env_vars/.ZBX_DB_KEY_FILE:/run/secrets/client-key.pem:ro
+      - zabbix:/etc/ssl/nginx:ro
+      - zabbix:/usr/share/zabbix/modules/:ro
+      # - zabbix/ZBX_DB_CA_FILE:/run/secrets/root-ca.pem:ro
+      # - zabbix/ZBX_DB_CERT_FILE:/run/secrets/client-cert.pem:ro
+      # - zabbix/ZBX_DB_KEY_FILE:/run/secrets/client-key.pem:ro
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/" ]
@@ -216,11 +227,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.70"
-          memory: 512M
-        reservations:
           cpus: "0.5"
           memory: 256M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
     sysctls:
       - net.core.somaxconn=65535
 
@@ -255,7 +266,14 @@ services:
     container_name: grafana
     hostname: grafana
 
-    image: grafana/grafana:9.5.1-ubuntu
+    image: grafana/grafana-oss:9.5.1
+
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - grafana:/var/lib/grafana:rw
+      - grafana:/var/log/grafana:rw
+      # - grafana:/etc/grafana:rw
 
     healthcheck:
       test: [ "CMD", "wget", "http://localhost:3000/", "--spider" ]
@@ -263,6 +281,15 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+
+    deploy:
+      resources:
+        limits:
+          cpus: "0.70"
+          memory: 512M
+        reservations:
+          cpus: "0.50"
+          memory: 256M
 
     restart: unless-stopped
     stop_grace_period: 1m
@@ -305,6 +332,16 @@ networks:
       driver: default
       config:
         - subnet: 1.1.1.0/24
+
+volumes:
+  db-pgsql:
+    name: "db-pgsql"
+
+  zabbix:
+    name: "zabbix"
+
+  grafana:
+    name: "grafana"
 
 secrets:
   DB_USER:
